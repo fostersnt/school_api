@@ -31,7 +31,7 @@ async def validation_exception_handler(request, exc):
 @app.exception_handler(FastAPIHTTPException)
 async def http_exception_handler(request, exc):
     return JSONResponse(
-        status_code=exc.status_code, content={"success": False, "message": exc.detail}
+        status_code=exc.status_code, content=exc.detail
     )
 
 students = []
