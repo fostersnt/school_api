@@ -50,8 +50,12 @@ def create_student(
     db: Session = Depends(get_db)
 ):
 
+    if CustomUtility.validateMsisdn(student.phone_number):
+        raise HTTPException(detail=CustomUtility.apiResponseFormat(False, 'Invalid phone number'))
+
     new_student = Student(
         first_name=student.first_name,
+        middle_name=student.middle_name,
         last_name=student.last_name,
         level=student.level,
         age=student.age,
