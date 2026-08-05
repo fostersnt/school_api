@@ -2,15 +2,20 @@ from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel, Field
 from typing import Optional
 from commons.Util import CustomUtility
-from model.Student import StudentCreateDto
-from model.Student import StudentResponseDto
-
+from schema.StudentSchema import StudentCreateDto
+from schema.StudentSchema import StudentResponseDto
+from fastapi import Depends
+from sqlalchemy.orm import Session
+from model import Student
+from database import get_db
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import HTTPException as FastAPIHTTPException
+from database import engine, Base
 
 # Initialize FastAPI instance (backed by Starlette)
 app = FastAPI(title="Item Management API", version="1.0.0")
+Base.metadata.create_all(bind=engine)
 
 
 #! Validation errors handler
@@ -38,17 +43,22 @@ students = []
 id_counter = 0
 
 
-@app.post("/students", response_model=StudentResponseDto, status_code=status.HTTP_201_CREATED)
-def create_item(student: StudentCreateDto):
-    msisdn_check = CustomUtility.validateMsisdn(student.msisdn)
-    if msisdn_check == False:
-        raise HTTPException(
-            status_code=500,
-            detail=CustomUtility.apiResponseFormat(False, "Invalid msisdn", []),
-        )
-    else:
-        global id_counter
-        new_item = StudentResponseDto(id=id_counter, **student.model_dump())
-        students.append(new_item)
-        id_counter += 1
-        return new_item
+@app.post("/students", response_model=StudentResponseDto)
+def create_student(
+    student: StudentCreateDto,
+    db: Session = Depends(get_db)
+):
+
+    new_student = Student(
+        first_name=student.first_name,
+        last_name=student.last_name,
+        level=student.level,
+        age=student.age,
+        msisdn=student.msisdn
+    )
+
+    db.add(new_student)
+    db.commit()
+    db.refresh(new_student)
+
+    return new_student
