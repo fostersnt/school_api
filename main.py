@@ -1,17 +1,18 @@
 from fastapi import FastAPI, HTTPException, status
-from pydantic import BaseModel, Field
-from typing import Optional
+# from pydantic import BaseModel, Field
+# from typing import Optional
 from commons.Util import CustomUtility
 from schema.StudentSchema import StudentCreateDto
 from schema.StudentSchema import StudentResponseDto
 from fastapi import Depends
 from sqlalchemy.orm import Session
-from model import Student
-from database import get_db
+from model.Student import Student
+from db_config.db_connection import get_db
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import HTTPException as FastAPIHTTPException
-from database import engine, Base
+from db_config.db_connection import engine, Base
+from commons.ApiResponse import ApiResponse
 
 # Initialize FastAPI instance (backed by Starlette)
 app = FastAPI(title="Item Management API", version="1.0.0")
@@ -43,7 +44,7 @@ students = []
 id_counter = 0
 
 
-@app.post("/students", response_model=StudentResponseDto)
+@app.post("/students")
 def create_student(
     student: StudentCreateDto,
     db: Session = Depends(get_db)
@@ -61,4 +62,4 @@ def create_student(
     db.commit()
     db.refresh(new_student)
 
-    return new_student
+    return CustomUtility.apiResponseFormat(True, "Student created successfully", new_student)

@@ -8,7 +8,7 @@ class CustomUtility:
         return bool(result)
 
     @staticmethod
-    def apiResponseFormat(success: bool, message: str, data: list):
+    def apiResponseFormat(success: bool, message: str, data: list|dict|None):
         return {
             "success": success,
             "message": message,

@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-class StudentCreate(BaseModel):
+class StudentCreateDto(BaseModel):
     first_name: str
     last_name: str
     level: str
@@ -8,7 +8,7 @@ class StudentCreate(BaseModel):
     msisdn: str
 
 
-class StudentResponse(StudentCreate):
+class StudentResponseDto(StudentCreateDto):
     id: int
 
     class Config:
