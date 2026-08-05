@@ -10,4 +10,4 @@ class Student(Base):
     last_name = Column(String)
     level = Column(String)
     age = Column(Integer)
-    msisdn = Column(String)
+    phone_number = Column(String)

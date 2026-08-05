@@ -5,7 +5,7 @@ class StudentCreateDto(BaseModel):
     last_name: str
     level: str
     age: int
-    msisdn: str
+    phone_number: str
 
 
 class StudentResponseDto(StudentCreateDto):
