@@ -41,11 +41,11 @@ class ItemBase(BaseModel):
     # price: float = Field(..., gt=0, example=29.99)
 
 
-class ItemCreate(ItemBase):
+class ItemCreate(ItemBase): #ItemCreate will inherit the properties of ItemBase - This is called Request DTO in C#
     pass
 
 
-class ItemResponse(ItemBase):
+class ItemResponse(ItemBase): #ItemResponse will inherit the properties of ItemBase in addition to its own properties - This is called Response DTO in C#
     id: int
 
 
