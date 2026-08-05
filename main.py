@@ -2,6 +2,8 @@ from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel, Field
 from typing import Optional
 from commons.Util import CustomUtility
+from model.Student import StudentCreateDto
+from model.Student import StudentResponseDto
 
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -32,30 +34,13 @@ async def http_exception_handler(request, exc):
         status_code=exc.status_code, content={"success": False, "message": exc.detail}
     )
 
-
-class ItemBase(BaseModel):
-    name: str = Field(..., example="Wireless Mouse")
-    age: int = Field(...)
-    msisdn: str = Field(..., min_length=12, max_length=12, example="233xxxxxxxxx")
-    # level: Optional[str] = Field(None, example="A fast 2.4GHz mouse")
-    # price: float = Field(..., gt=0, example=29.99)
-
-
-class ItemCreate(ItemBase): #ItemCreate will inherit the properties of ItemBase - This is called Request DTO in C#
-    pass
-
-
-class ItemResponse(ItemBase): #ItemResponse will inherit the properties of ItemBase in addition to its own properties - This is called Response DTO in C#
-    id: int
-
-
 students = []
 id_counter = 0
 
 
-@app.post("/items", response_model=ItemResponse, status_code=status.HTTP_201_CREATED)
-def create_item(item: ItemCreate):
-    msisdn_check = CustomUtility.validateMsisdn(item.msisdn)
+@app.post("/students", response_model=StudentResponseDto, status_code=status.HTTP_201_CREATED)
+def create_item(student: StudentCreateDto):
+    msisdn_check = CustomUtility.validateMsisdn(student.msisdn)
     if msisdn_check == False:
         raise HTTPException(
             status_code=500,
@@ -63,7 +48,7 @@ def create_item(item: ItemCreate):
         )
     else:
         global id_counter
-        new_item = ItemResponse(id=id_counter, **item.model_dump())
+        new_item = StudentResponseDto(id=id_counter, **student.model_dump())
         students.append(new_item)
         id_counter += 1
         return new_item
