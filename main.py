@@ -49,21 +49,22 @@ def create_student(
     student: StudentCreateDto,
     db: Session = Depends(get_db)
 ):
+    phone_number_check = CustomUtility.validateMsisdn(student.phone_number)
 
-    if CustomUtility.validateMsisdn(student.phone_number):
-        raise HTTPException(detail=CustomUtility.apiResponseFormat(False, 'Invalid phone number'))
+    if phone_number_check == False:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=CustomUtility.apiResponseFormat(False, 'Invalid phone number', None))
+    else:
+        new_student = Student(
+            first_name=student.first_name,
+            middle_name=student.middle_name,
+            last_name=student.last_name,
+            level=student.level,
+            age=student.age,
+            phone_number=student.phone_number
+        )
 
-    new_student = Student(
-        first_name=student.first_name,
-        middle_name=student.middle_name,
-        last_name=student.last_name,
-        level=student.level,
-        age=student.age,
-        msisdn=student.msisdn
-    )
+        db.add(new_student)
+        db.commit()
+        db.refresh(new_student)
 
-    db.add(new_student)
-    db.commit()
-    db.refresh(new_student)
-
-    return CustomUtility.apiResponseFormat(True, "Student created successfully", new_student)
+        return CustomUtility.apiResponseFormat(True, "Student created successfully", new_student)
